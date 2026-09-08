@@ -133,7 +133,6 @@ export async function executeProviderRequest(
     credentials,
     dedupEnabled,
     dedupHash,
-    effectiveModel,
     executor,
     extendedContext,
     getExecutionCredentials,
