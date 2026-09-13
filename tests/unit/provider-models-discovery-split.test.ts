@@ -141,6 +141,20 @@ test("providerModelsConfig keeps the aimlapi live catalog entry", () => {
   assert.equal(PROVIDER_MODELS_CONFIG.aimlapi.url, "https://api.aimlapi.com/models");
 });
 
+test("providerModelsConfig gives xAI OAuth its isolated live catalog endpoint", () => {
+  const config = PROVIDER_MODELS_CONFIG["xai-oauth"];
+
+  assert.ok(config);
+  assert.equal(config.url, "https://api.x.ai/v1/models");
+  assert.equal(config.method, "GET");
+  assert.equal(config.authHeader, "Authorization");
+  assert.equal(config.authPrefix, "Bearer ");
+  assert.deepEqual(config.parseResponse({ data: [{ id: "grok-4.7" }] }), [{ id: "grok-4.7" }]);
+  assert.deepEqual(config.parseResponse({ models: [{ id: "grok-4.7" }] }), [
+    { id: "grok-4.7" },
+  ]);
+});
+
 test("providerModelsConfig aimlapi.parseResponse keeps only chat-completion models when present", () => {
   const parsed = PROVIDER_MODELS_CONFIG.aimlapi.parseResponse([
     { id: "chat-1", type: "chat-completion", info: { name: "Chat 1" } },
