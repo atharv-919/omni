@@ -92,7 +92,12 @@ export type AttemptLoopDeps = {
     executionKey: string | undefined,
     comboId: string | undefined,
     log: ComboLogger,
-    tag: string
+    tag: string,
+    /** Test seam for the SQLite write; routing always passes undefined. */
+    clearLKGP?: unknown,
+    /** The target whose failure triggered the clear, so the combo-level pin is
+     *  only cleared when it actually names that target (#12235). */
+    failed?: { provider?: string | null; connectionId?: string | null } | null
   ) => void;
   /**
    * Closed-over setup values from handleComboChatInner. Optional so Task 2
