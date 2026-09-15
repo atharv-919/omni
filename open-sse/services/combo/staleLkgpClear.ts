@@ -13,14 +13,41 @@
 type WarnLogger = { warn?: (tag: string, msg: string, data?: unknown) => void } | null;
 type ClearLkgp = (comboName: string, modelKey: string) => Promise<void>;
 
+/** The target whose failure triggered the clear, when the caller has one in scope. */
+export type FailedTarget = { provider?: string | null; connectionId?: string | null } | null;
+
 async function clearPins(
   comboName: string,
   executionKey: string | null | undefined,
   comboId: string | null | undefined,
-  clearLKGP: ClearLkgp | undefined
+  clearLKGP: ClearLkgp | undefined,
+  failed: FailedTarget | undefined
 ): Promise<void> {
-  const clear = clearLKGP ?? (await import("@/lib/db/settings")).clearLKGP;
-  const keys = [comboId || comboName, ...(executionKey ? [executionKey] : [])];
+  const settings = await import("@/lib/db/settings");
+  const clear = clearLKGP ?? settings.clearLKGP;
+  const comboKey = comboId || comboName;
+
+  // The target-scoped pin is unambiguously about the target that just failed.
+  const keys: string[] = executionKey ? [executionKey] : [];
+
+  // The combo-level pin records whichever provider last SUCCEEDED, which need not
+  // be the one failing now. Under `auto` it is a scoring input rather than a hoist
+  // (`resolveAutoStrategy` reads it into `lastKnownGoodProvider`), so clearing it
+  // unconditionally discarded a preference for a healthy provider every time an
+  // unrelated target was skipped (#12235). With no `failed` in scope the previous
+  // unconditional behaviour is kept, so callers without a target are unaffected.
+  if (!failed?.provider) {
+    keys.push(comboKey);
+  } else {
+    const pin = await settings.getLKGP(comboName, comboKey);
+    // Same provider, and — when both sides carry one — the same connection.
+    // A sibling connection failing does not make the pinned one stale.
+    const namesFailedTarget =
+      pin?.provider === failed.provider &&
+      (!pin?.connectionId || !failed.connectionId || pin.connectionId === failed.connectionId);
+    if (namesFailedTarget) keys.push(comboKey);
+  }
+
   await Promise.all(keys.map((key) => clear(comboName, key)));
 }
 
@@ -31,9 +58,16 @@ export function clearStaleLKGP(
   log?: WarnLogger,
   tag: string = "COMBO",
   /** Test seam; the routing path always resolves clearLKGP from @/lib/db/settings. */
-  clearLKGP?: ClearLkgp
+  clearLKGP?: ClearLkgp,
+  /**
+   * Seventh rather than sixth deliberately: `clearLKGP` above is passed
+   * positionally by `stale-lkgp-clear-13614.test.ts`, so inserting ahead of it
+   * would silently rebind that argument. Production callers pass `undefined` for
+   * the seam; see the PR for an options-object alternative if this grows again.
+   */
+  failed?: FailedTarget
 ): Promise<void> {
-  return clearPins(comboName, executionKey, comboId, clearLKGP).catch((err: unknown) => {
+  return clearPins(comboName, executionKey, comboId, clearLKGP, failed).catch((err: unknown) => {
     log?.warn?.(tag, "Failed to clear Last Known Good Provider. This is non-fatal.", {
       combo: comboName,
       comboId: comboId ?? null,
