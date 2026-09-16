@@ -1,0 +1,1 @@
+- **fix(translator):** preserve empty tool call responses in `openai-to-gemini` translator instead of skipping them when checking falsiness ([#13833](https://github.com/diegosouzapw/OmniRoute/pull/13833))

@@ -58,7 +58,8 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // credentials through getProviderCredentials with the connection allowlist
     // from resolveLocalSyncedEndpointRoute, and handles allRateLimited, so it is
     // fenced the same way as the two pre-existing sites.
-    "src/lib/embeddings/service.ts": 3,
+    // #13398/#13234: fourth site sends stored API key on private-host embeddings nodes.
+    "src/lib/embeddings/service.ts": 4,
     // PR #11390: second site is the generic derived-provider listing fallback —
     // read-only key presence probe used to decide whether a configured chat
     // provider may appear in the memory embedding-source dropdown.

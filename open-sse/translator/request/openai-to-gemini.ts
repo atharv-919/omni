@@ -490,15 +490,20 @@ function openaiToGeminiBase(
             contextualizeSignaturelessToolResponses &&
             toolCalls.some((tc) => {
               const id = tc.id as string;
-              return tc.type === "function" && !resolvedSignatures.has(id) && toolResponses[id];
+              return (
+                tc.type === "function" &&
+                !resolvedSignatures.has(id) &&
+                toolResponses[id] !== undefined
+              );
             });
           const hasActualResponses =
-            toolCallIds.some((fid) => toolResponses[fid]) || hasSignaturelessTextResponses;
+            toolCallIds.some((fid) => toolResponses[fid] !== undefined) ||
+            hasSignaturelessTextResponses;
 
           if (hasActualResponses) {
             const toolParts: GeminiPart[] = [];
             for (const fid of toolCallIds) {
-              if (!toolResponses[fid]) continue;
+              if (toolResponses[fid] === undefined) continue;
               if (
                 !toolNameOptions.supportsSignatureBypass &&
                 contextualizeSignaturelessToolResponses &&
@@ -517,7 +522,7 @@ function openaiToGeminiBase(
               }
               name = sanitizeToolName(name);
 
-              const resp = toolResponses[fid];
+              const resp = toolResponses[fid] ?? "";
 
               toolParts.push({
                 functionResponse: {
@@ -541,10 +546,10 @@ function openaiToGeminiBase(
               for (const tc of toolCalls) {
                 const id = tc.id as string;
                 if (tc.type !== "function" || !id) continue;
-                if (!resolvedSignatures.has(id) && toolResponses[id]) {
+                if (!resolvedSignatures.has(id) && toolResponses[id] !== undefined) {
                   const fn = tc.function as { name?: string } | undefined;
                   const name = tcID2Name[id] || fn?.name || "unknown";
-                  const resp = toolResponses[id];
+                  const resp = toolResponses[id] ?? "";
                   toolParts.push({
                     text:
                       signaturelessToolCallMode === "text"

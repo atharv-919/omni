@@ -344,6 +344,7 @@
       "tests/unit/probe-gate-autodisable.test.ts",
       "tests/unit/probe-production-path.test.ts",
       "tests/unit/probe-testall-isolation.test.ts",
+      "tests/unit/provider-401-ambiguous-runtime.test.ts",
       "tests/unit/provider-breaker-halfopen-recovery.test.ts",
       "tests/unit/provider-error-rules.test.ts",
       "tests/unit/provider-execution-pipeline.test.ts",
