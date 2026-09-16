@@ -47,9 +47,14 @@ export function getQuotaScopedModelForProvider(
   return normalizeModelId(model).replace(/^antigravity\//, "");
 }
 
+// Antigravity quota is always exact-model scoped after #10011: a 429 for one
+// model must never poison a sibling. The parameters stay in the signature so
+// every call site keeps reading as "scope of THIS provider/model" (and so the
+// label can become conditional again without touching the callers), but the
+// answer no longer depends on them.
 export function getQuotaScopeLabelForProvider(
-  provider: string | null | undefined,
-  model: string | null | undefined
+  _provider: string | null | undefined,
+  _model: string | null | undefined
 ): string {
   return "model";
 }
@@ -133,5 +138,7 @@ export function selectAntigravityQuotaWindowNames(
   const scoped = [...exactWindows, ...aggregateWindows];
   if (scoped.length > 0) return scoped;
 
-  return quotaNames.filter((windowName) => getAntigravityQuotaFamily(windowName) === requestedFamily);
+  return quotaNames.filter(
+    (windowName) => getAntigravityQuotaFamily(windowName) === requestedFamily
+  );
 }
