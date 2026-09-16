@@ -36,6 +36,10 @@ const EXPECTED_LEADING_MODEL_ORDER = [
   "gemini-3.7-flash-medium",
   "gemini-3.7-flash-low",
   "gemini-3.7-flash-tiered",
+  "gemini-3.8-flash-high",
+  "gemini-3.8-flash-medium",
+  "gemini-3.8-flash-low",
+  "gemini-3.8-flash-tiered",
   "gemini-pro-agent",
   "gemini-3.1-pro-low",
   "gemini-3.1-flash-lite",
@@ -158,6 +162,22 @@ test("Antigravity and AGY support metadata excludes retired Flash ids", () => {
     assert.equal(cliModelIds.includes(modelId), true, `${modelId} must remain a CLI default`);
     assert.equal(agyFreeModelIds.includes(modelId), true, `${modelId} must remain in AGY metadata`);
     assert.ok(pricing[modelId], `${modelId} must retain Antigravity pricing`);
+  }
+});
+
+test("Antigravity support catalogs expose and price live Gemini 3.8 Flash tiers", () => {
+  const cliAliases = CLI_TOOLS.antigravity.modelAliases;
+  const cliModelIds = CLI_TOOLS.antigravity.defaultModels.map((m) => m.id);
+  const pricing = getDefaultPricing().ag;
+
+  for (const modelId of [
+    "gemini-3.8-flash-high",
+    "gemini-3.8-flash-medium",
+    "gemini-3.8-flash-low",
+  ]) {
+    assert.equal(cliAliases.includes(modelId), true, `${modelId} missing from CLI aliases`);
+    assert.equal(cliModelIds.includes(modelId), true, `${modelId} missing from CLI default models`);
+    assert.ok(pricing[modelId], `${modelId} missing from Antigravity pricing`);
   }
 });
 
