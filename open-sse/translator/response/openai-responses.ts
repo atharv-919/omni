@@ -23,13 +23,17 @@ import {
 } from "./openai-responses/pureHelpers.ts";
 import { createEventEmitter } from "./openai-responses/eventEmitter.ts";
 import { buildResponsesToolCallItem } from "./responsesToolItem.ts";
-import { resolveRequestToolIdentity } from "./openai-responses/requestToolIdentity.ts";
+import {
+  resolveRequestToolIdentity,
+  resolveToolCustomStatus,
+} from "./openai-responses/requestToolIdentity.ts";
 import { resolveLocalToolCallIndex } from "./openai-responses/toolCallLocalIndex.ts";
 import {
   synthesizeCompletedToolCalls,
   computeFinishReason,
   withAssistantRoleOnFirstDelta,
 } from "./openai-responses/synthesizeCompletedToolCalls.ts";
+
 // normalizeUpstreamFailure is re-exported for external importers (tests).
 export { normalizeUpstreamFailure } from "./openai-responses/pureHelpers.ts";
 
@@ -543,10 +547,7 @@ function emitToolCall(state, emit, tc) {
   // unconditional `toolName === "apply_patch"` OR never actually implemented the carve-out.
   const toolName = state.funcNames[tcIdx] || funcName || "";
   const lowerName = toolName.toLowerCase();
-  const isCustomTool =
-    ((lowerName === "apply_patch" || lowerName === "applypatch") &&
-      !state.toolSchemas?.has?.(toolName)) ||
-    state.customToolNames?.has?.(toolName) === true;
+  const { identity, isCustomTool } = resolveToolCustomStatus(state, toolName, lowerName);
 
   if (!state.funcCallIds[tcIdx] && newCallId) state.funcCallIds[tcIdx] = newCallId;
   const callId = state.funcCallIds[tcIdx];
@@ -555,7 +556,6 @@ function emitToolCall(state, emit, tc) {
     // #7936 — restore the codex-side `{namespace, name}` pair when the bare
     // leaf on the Chat wire was flattened from a Responses namespace sub-tool.
     // Codex dispatches from `namespace` independently of `name` (no `__` split).
-    const identity = resolveRequestToolIdentity(state.requestToolIdentityMap, toolName);
     emit("response.output_item.added", {
       type: "response.output_item.added",
       output_index: outputIndex,
@@ -613,13 +613,10 @@ function closeToolCall(state, emit, idx, recordAsCompleted = true) {
     const normalizedIndex = toolCallOutputIndexBase(state) + resolveLocalToolCallIndex(state, idx);
     const args = state.funcArgsBuf[idx] || "{}";
     const toolName = state.funcNames[idx] || "";
-    // See emitToolCall()'s isCustomTool comment — must stay in sync (both compute the
-    // same classification independently for their respective add/close call sites).
+    // Shared with emitToolCall() via resolveToolCustomStatus() — must stay in sync
+    // (both call sites classify the same tool independently for add/close).
     const lowerName = toolName.toLowerCase();
-    const isCustomTool =
-      ((lowerName === "apply_patch" || lowerName === "applypatch") &&
-        !state.toolSchemas?.has?.(toolName)) ||
-      state.customToolNames?.has?.(toolName) === true;
+    const { isCustomTool } = resolveToolCustomStatus(state, toolName, lowerName);
 
     let funcItem;
     if (isCustomTool) {
