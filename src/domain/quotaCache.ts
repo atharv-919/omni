@@ -299,10 +299,30 @@ function isAntigravityQuotaExhausted(
   if (!requestedModel) return entry.exhausted;
   const quotaNames = Object.keys(entry.quotas || {});
   if (quotaNames.length === 0) return entry.exhausted;
-  const matchingWindows = resolveAntigravityQuotaWindowsForModel(quotaNames, requestedModel);
+
+  // A known exact bucket is authoritative.  In particular, a healthy exact
+  // model must not be poisoned by an exhausted sibling/family observation.
+  const cleanRequestedModel = requestedModel
+    .trim()
+    .toLowerCase()
+    .replace(/^(antigravity|agy)\//, "");
+  const bareRequestedModel = cleanRequestedModel.includes("/")
+    ? cleanRequestedModel.slice(cleanRequestedModel.lastIndexOf("/") + 1)
+    : cleanRequestedModel;
+  const exactWindows = quotaNames.filter((windowName) => {
+    const key = windowName
+      .trim()
+      .toLowerCase()
+      .replace(/^(antigravity|agy)\//, "");
+    return key === cleanRequestedModel || key === bareRequestedModel;
+  });
+  const windows =
+    exactWindows.length > 0
+      ? exactWindows
+      : resolveAntigravityQuotaWindowsForModel(quotaNames, requestedModel);
   return (
-    matchingWindows.length > 0 &&
-    matchingWindows.every(
+    windows.length > 0 &&
+    windows.every(
       (windowName) =>
         // Automatic exhaustion is not the operator's optional usage cutoff.
         getQuotaWindowStatus(connectionId, windowName, 100)?.reachedThreshold
