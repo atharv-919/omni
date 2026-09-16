@@ -452,10 +452,26 @@ test("classify429: Moonshot organization TPD rate limit is quota_exhausted", () 
   assert.equal(looksLikeQuotaExhausted(MOONSHOT_TPD), true);
 });
 
+test("classify429: TPD rate limit with a short upstream retry hint stays terminal", () => {
+  // Regression guard: TERMINAL_QUOTA_PATTERNS must win over a short retry hint —
+  // these signals mean the account will not recover until the next billing
+  // window, so a "please retry in 5s" hint must not downgrade them to rate_limit.
+  const body = `${MOONSHOT_TPD} Please retry in 5s.`;
+  assert.equal(classify429({ status: 429, body }), "quota_exhausted");
+});
+
+test("classify429: insufficient balance with a short upstream retry hint stays terminal", () => {
+  const body = "Error: insufficient balance for this request. Please retry in 5s.";
+  assert.equal(classify429({ status: 429, body }), "quota_exhausted");
+});
+
 test("classify429: Moonshot engine overloaded stays rate_limit", () => {
   assert.equal(
-    classify429({ status: 429, body: "The engine is currently overloaded, please try again later" }),
-    "rate_limit",
+    classify429({
+      status: 429,
+      body: "The engine is currently overloaded, please try again later",
+    }),
+    "rate_limit"
   );
 });
 

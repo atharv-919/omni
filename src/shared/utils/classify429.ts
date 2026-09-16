@@ -167,6 +167,9 @@ const TERMINAL_QUOTA_PATTERNS: ReadonlyArray<RegExp> = [
   /individual quota reached/i,
   /enable overages/i,
   /daily free allocation/i,
+  /organization TPD rate limit/i,
+  /\bTPD rate limit\b/i,
+  /insufficient balance/i,
 ];
 
 /**
@@ -282,7 +285,7 @@ export function classify429(response: {
   // account-fallback classifier (which handles them) while the provider
   // breaker keeps hammering the dead provider.
   if (text && TERMINAL_QUOTA_PATTERNS.some((pat) => pat.test(text))) {
-    if (status === 429 || status >= 400) return "quota_exhausted";
+    if (status >= 400) return "quota_exhausted";
   }
 
   if (status !== 429) return "transient";
