@@ -72,6 +72,7 @@ export interface ApiKeyMetadata {
   name?: string;
   modelAccessMode?: "all" | "restricted";
   allowedModels?: string[];
+  blockedModels?: string[];
   allowedCombos?: string[];
   allowedConnections?: string[];
   allowedQuotas?: string[];
@@ -319,6 +320,7 @@ async function validateStandardRoutingTarget(
   const hasModelRestrictions =
     apiKeyInfo.modelAccessMode === "restricted" ||
     Boolean(apiKeyInfo.allowedModels?.length) ||
+    Boolean(apiKeyInfo.blockedModels?.length) ||
     apiKeyInfo.disableNonPublicModels === true;
   if (!requestedComboName && hasModelRestrictions && modelStr.startsWith("auto/")) {
     requestedComboName = modelStr;
@@ -531,6 +533,7 @@ async function validateModelAccess(context: PolicyContext): Promise<Response | n
   const hasModelRestrictions =
     apiKeyInfo.modelAccessMode === "restricted" ||
     Boolean(apiKeyInfo.allowedModels?.length) ||
+    Boolean(apiKeyInfo.blockedModels?.length) ||
     apiKeyInfo.disableNonPublicModels === true;
   if (!requestedComboName && hasModelRestrictions) {
     if (modelStr.startsWith("auto/") || modelStr.startsWith("qtSd/")) {
