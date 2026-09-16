@@ -362,11 +362,8 @@ test("handleResponsesCore transforms Command Code executor SSE through Responses
           choices: [{ index: 0, delta }],
         })}\n\n`;
       return new Response(
-        [
-          chunk({ role: "assistant" }),
-          chunk({ content: "command" }),
-          chunk({}),
-        ].join("") + "data: [DONE]\n\n",
+        [chunk({ role: "assistant" }), chunk({ content: "command" }), chunk({})].join("") +
+          "data: [DONE]\n\n",
         { status: 200, headers: { "Content-Type": "text/event-stream" } }
       );
     },

@@ -10,12 +10,10 @@ const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omni-rtk-mcp-"));
 process.env.DATA_DIR = TEST_DATA_DIR;
 
 const core = await import("../../../src/lib/db/core.ts");
-const { handleRtkDiscover, handleRtkLearn } = await import(
-  "../../../open-sse/mcp-server/tools/compressionTools.ts"
-);
-const { maybePersistRtkRawOutput } = await import(
-  "../../../open-sse/services/compression/engines/rtk/rawOutput.ts"
-);
+const { handleRtkDiscover, handleRtkLearn } =
+  await import("../../../open-sse/mcp-server/tools/compressionTools.ts");
+const { maybePersistRtkRawOutput } =
+  await import("../../../open-sse/services/compression/engines/rtk/rawOutput.ts");
 const { getRecentAuditEntries } = await import("../../../open-sse/mcp-server/audit.ts");
 
 const NOISE = [
@@ -66,7 +64,10 @@ describe("RTK MCP tools (T07)", () => {
     const result = await handleRtkLearn({ command: "gradle build", limit: 100 });
     assert.equal(result.command, "gradle build");
     assert.ok(result.sampleCount >= 1, "expected at least one matching sample");
-    assert.ok(result.filter && typeof result.filter === "object", "expected a suggested filter draft");
+    assert.ok(
+      result.filter && typeof result.filter === "object",
+      "expected a suggested filter draft"
+    );
   });
 
   it("returns an empty/baseline result with no samples (no throw)", async () => {

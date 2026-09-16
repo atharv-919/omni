@@ -62,7 +62,11 @@ test("isRetryableProxyTarget rejects every private / link-local / metadata host"
 
 test("isRetryableProxyTarget allows public provider targets", () => {
   for (const url of PUBLIC_TARGETS) {
-    assert.equal(isRetryableProxyTarget(url), true, `${url} should be a valid proxy-fallback target`);
+    assert.equal(
+      isRetryableProxyTarget(url),
+      true,
+      `${url} should be a valid proxy-fallback target`
+    );
   }
 });
 

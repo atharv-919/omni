@@ -24,7 +24,7 @@ const testRoots = new Set<string>();
 async function createAuthCookie(): Promise<string> {
   process.env.JWT_SECRET = "test-cli-tools-apply-secret";
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-  const token = await new SignJWT({ sub: "test-user" })
+  const token = await new SignJWT({ authenticated: true, sub: "test-user" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("1h")
@@ -79,7 +79,8 @@ test.afterEach(async () => {
   if (originalAllowContainerWrite === undefined)
     delete process.env.OMNIROUTE_ALLOW_CONTAINER_CONFIG_WRITE;
   else process.env.OMNIROUTE_ALLOW_CONTAINER_CONFIG_WRITE = originalAllowContainerWrite;
-  for (const root of testRoots) await fs.rm(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  for (const root of testRoots)
+    await fs.rm(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   testRoots.clear();
 });
 

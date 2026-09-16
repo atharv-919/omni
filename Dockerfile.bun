@@ -39,8 +39,7 @@ RUN bun -e "import { Database } from 'bun:sqlite'; const db = new Database(':mem
 
 COPY . .
 
-# Turbopack is supported on Bun 1.4+ (Next 16.3); override via
-# --build-arg OMNIROUTE_USE_TURBOPACK=0 to force the webpack fallback.
+# Turbopack is supported on Bun 1.4 + Next 16.3; override via --build-arg OMNIROUTE_USE_TURBOPACK=0 if needed
 ARG OMNIROUTE_USE_TURBOPACK=1
 ENV OMNIROUTE_USE_TURBOPACK=${OMNIROUTE_USE_TURBOPACK}
 
