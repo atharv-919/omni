@@ -36,7 +36,6 @@ const MUX_PORT = parseInt(process.env.MUX_SERVICE_PORT ?? String(MUX_DEFAULT_POR
 const BIFROST_PORT = parseInt(process.env.BIFROST_PORT ?? String(BIFROST_DEFAULT_PORT), 10);
 const DARIO_PORT = parseInt(process.env.DARIO_PORT ?? String(DARIO_DEFAULT_PORT), 10);
 const SINGBOX_PORT = parseInt(process.env.SINGBOX_PORT ?? String(SINGBOX_DEFAULT_PORT), 10);
-const SINGBOX_PORT = parseInt(process.env.SINGBOX_PORT ?? String(SINGBOX_DEFAULT_PORT), 10);
 
 type ServiceEntry = {
   tool: string;
