@@ -52,7 +52,9 @@ test("bifrostClient: dispatchToBifrost handles streaming response and finalizer"
     return new Response(
       new ReadableStream<Uint8Array>({
         start(controller) {
-          controller.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n'));
+          controller.enqueue(
+            new TextEncoder().encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n')
+          );
           controller.close();
         },
       }),
@@ -89,6 +91,44 @@ test("bifrostClient: dispatchToBifrost handles streaming response and finalizer"
   assert.match(streamText, /Hi/);
   assert.equal(recordedStatus, "success");
   assert.equal(recordedCode, 200);
+
+  globalThis.fetch = ORIGINAL_FETCH;
+});
+
+test("bifrostClient: dispatchToBifrost sanitizes a 4xx sidecar body instead of passing it through", async () => {
+  globalThis.fetch = async () => {
+    return new Response(
+      JSON.stringify({
+        error:
+          "invalid request at /home/operator/.omniroute/data/bifrost/config.json: access_token=sk-leaked-secret",
+      }),
+      { status: 400, headers: { "content-type": "application/json" } }
+    );
+  };
+
+  const dummyReq = new Request("http://localhost:20128/v1/chat/completions", { method: "POST" });
+
+  const result = await dispatchToBifrost({
+    request: dummyReq,
+    body: { model: "gpt-4", messages: [] },
+    config: {
+      baseUrl: "http://127.0.0.1:8080",
+      timeoutMs: 5000,
+      streamingEnabled: true,
+      enabled: true,
+    },
+  });
+
+  assert.equal(result.statusCode, 400);
+  assert.equal(result.response.status, 400);
+  assert.equal(result.response.headers.get("Content-Type"), "application/json");
+
+  const parsed = (await result.response.json()) as { error: { message: string } };
+  assert.ok(
+    !parsed.error.message.includes("sk-leaked-secret"),
+    "leaked credential must be redacted"
+  );
+  assert.ok(!parsed.error.message.includes("/home/operator"), "internal path must be redacted");
 
   globalThis.fetch = ORIGINAL_FETCH;
 });
