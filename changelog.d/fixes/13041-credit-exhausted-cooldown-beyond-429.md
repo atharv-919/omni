@@ -1,0 +1,1 @@
+- **fix(resilience):** provider cooldown now trips on credit-exhausted signals carried by non-429 statuses (400/401/402/403/5xx), not only on 429 — previously a dead provider kept getting reselected instead of entering the long terminal cooldown ([#13041](https://github.com/diegosouzapw/OmniRoute/pull/13041)) — thanks @turbolego

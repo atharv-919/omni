@@ -452,9 +452,56 @@ test("classify429: Moonshot organization TPD rate limit is quota_exhausted", () 
   assert.equal(looksLikeQuotaExhausted(MOONSHOT_TPD), true);
 });
 
+test("classify429: TPD rate limit with a short upstream retry hint stays terminal", () => {
+  // Regression guard: TERMINAL_QUOTA_PATTERNS must win over a short retry hint —
+  // these signals mean the account will not recover until the next billing
+  // window, so a "please retry in 5s" hint must not downgrade them to rate_limit.
+  const body = `${MOONSHOT_TPD} Please retry in 5s.`;
+  assert.equal(classify429({ status: 429, body }), "quota_exhausted");
+});
+
+test("classify429: insufficient balance with a short upstream retry hint stays terminal", () => {
+  const body = "Error: insufficient balance for this request. Please retry in 5s.";
+  assert.equal(classify429({ status: 429, body }), "quota_exhausted");
+});
+
 test("classify429: Moonshot engine overloaded stays rate_limit", () => {
   assert.equal(
-    classify429({ status: 429, body: "The engine is currently overloaded, please try again later" }),
-    "rate_limit",
+    classify429({
+      status: 429,
+      body: "The engine is currently overloaded, please try again later",
+    }),
+    "rate_limit"
   );
+});
+
+// --- Provider breaker: credit/billing exhaustion signals beyond 429 ---
+
+test("classify429: 4xx/5xx with a terminal credits-exhausted body returns 'quota_exhausted'", () => {
+  // 402 is the canonical "payment required" signal. Providers also surface
+  // free-tier exhaustion as 400/401/403/502 with a body that says credits
+  // are gone. The provider breaker should put these on the long cooldown,
+  // not treat them as transient.
+  const body = "You have exhausted all your credits. Please purchase more to continue.";
+  for (const status of [400, 401, 402, 403, 429, 500, 502, 503]) {
+    assert.equal(classify429({ status, body }), "quota_exhausted", `status ${status}`);
+  }
+});
+
+test("classify429: only the terminal phrases trip on non-429 statuses", () => {
+  // A generic quota body on a 5xx must NOT be promoted to a long cooldown —
+  // that would misclassify a transient server error as exhaustion.
+  const quotaBody = "You have exceeded your daily limit. Please try again tomorrow.";
+  assert.equal(classify429({ status: 500, body: quotaBody }), "transient");
+  // When the body is a terminal credits signal, ANY 4xx/5xx trips.
+  const creditBody = "Your credits are exhausted. Please top up to continue.";
+  assert.equal(classify429({ status: 400, body: creditBody }), "quota_exhausted");
+});
+
+test("looksLikeQuotaExhausted: 'exhausted all your credits' variants are detected", () => {
+  assert.equal(looksLikeQuotaExhausted("exhausted all your credits"), true);
+  assert.equal(looksLikeQuotaExhausted("You have exhausted all your credits"), true);
+  assert.equal(looksLikeQuotaExhausted("all of your free credits have been exhausted"), true);
+  // word-order variants the prior /credit.*exhaust/ regex could not see
+  assert.equal(looksLikeQuotaExhausted("all your credits have been exhausted"), true);
 });

@@ -41,6 +41,8 @@ const QUOTA_PATTERNS: ReadonlyArray<RegExp> = [
   /billing.*cap/i,
   /credit.*exhaust/i,
   /out of credits/i,
+  /exhausted all your credits/i,
+  /have exhausted all your credits/i,
   /hard.?limit/i,
   /plan.*limit/i,
 
@@ -192,6 +194,8 @@ const TERMINAL_QUOTA_PATTERNS: ReadonlyArray<RegExp> = [
   /INSUFFICIENT_G1_CREDITS_BALANCE/i,
   /credit.*exhaust/i,
   /out of credits/i,
+  /exhausted all your credits/i,
+  /have exhausted all your credits/i,
   /billing.*cap/i,
   /insufficient.*quota/i,
   /individual quota reached/i,
@@ -304,11 +308,21 @@ export function classify429(response: {
   headers?: Record<string, string>;
   body?: unknown;
 }): FailureKind {
-  if (response.status !== 429) return "transient";
   const text = bodyToText(response.body);
+  const status = Number(response.status);
+
+  // A terminal credits/billing signal in the body means the account will not
+  // recover until credits are added, regardless of the HTTP status it arrived
+  // on. 402 (Payment Required) is the canonical signal, but providers also
+  // surface it as 400/401/403/429/502 with a body that says the free tier
+  // is exhausted. Returning only 429 would let these fall through to the
+  // account-fallback classifier (which handles them) while the provider
+  // breaker keeps hammering the dead provider.
   if (text && TERMINAL_QUOTA_PATTERNS.some((pat) => pat.test(text))) {
-    return "quota_exhausted";
+    if (status >= 400) return "quota_exhausted";
   }
+
+  if (status !== 429) return "transient";
   const declaredDelay = upstreamRetryDelaySeconds(response.body);
   if (declaredDelay !== null && declaredDelay < QUOTA_SCALE_RETRY_DELAY_SECONDS) {
     return "rate_limit";
