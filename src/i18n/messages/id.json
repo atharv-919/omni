@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "Pengaturan OAuth Duo GitLab",
     "gitlabDuoSetupMessage": "GitLab Duo OAuth belum dikonfigurasi. Daftarkan aplikasi OAuth di {applicationsUrl} dengan URI pengalihan {redirectUri} dan cakupan \"{scopes}\", lalu atur {clientIdEnv} (dan opsional {clientSecretEnv}) dan mulai ulang.",
     "gitlabDuoSetupDescription": "Setelah aplikasi terdaftar dan variabel lingkungan diatur pada instance OmniRoute ini, klik Lanjutkan untuk memulai login OAuth.",
-    "continue": "Lanjutkan"
+    "continue": "Lanjutkan",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Hubungkan IDE Kursor",

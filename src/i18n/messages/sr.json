@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "Подешавање GitLab Duo OAuth-а",
     "gitlabDuoSetupMessage": "GitLab Duo OAuth није подешен. Региструјте OAuth апликацију на {applicationsUrl} са redirect URI {redirectUri} и обимима „{scopes}“, затим подесите {clientIdEnv} (и опционо {clientSecretEnv}) и поново покрените.",
     "gitlabDuoSetupDescription": "Након што апликација буде регистрована и променљиве окружења подешене на овој OmniRoute инстанци, кликните на Настави да покренете OAuth пријаву.",
-    "continue": "Настави"
+    "continue": "Настави",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Повежи Cursor",

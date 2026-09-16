@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "GitLab Duo OAuth စနစ်ထည့်သွင်းခြင်း",
     "gitlabDuoSetupMessage": "GitLab Duo OAuth ကို ပြင်ဆင်သတ်မှတ်ထားခြင်း မရှိသေးပါ။ redirect URI {redirectUri} နှင့် scope များ \"{scopes}\" ကို အသုံးပြု၍ {applicationsUrl} တွင် OAuth application တစ်ခု မှတ်ပုံတင်ပါ၊ ထို့နောက် {clientIdEnv} (နှင့် လိုအပ်ပါက {clientSecretEnv}) ကို သတ်မှတ်ပြီး ပြန်လည်စတင်ပါ။",
     "gitlabDuoSetupDescription": "Application ကို မှတ်ပုံတင်ပြီး ဤ OmniRoute instance တွင် env var များ သတ်မှတ်ပြီးပါက OAuth အကောင့်ဝင်ခြင်းကို စတင်ရန် ဆက်လုပ်ရန်ကို နှိပ်ပါ။",
-    "continue": "ဆက်လုပ်ရန်"
+    "continue": "ဆက်လုပ်ရန်",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Cursor ကို ချိတ်ဆက်ရန်",

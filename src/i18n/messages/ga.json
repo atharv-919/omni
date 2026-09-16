@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "Socrúchán OAuth GitLab Duo",
     "gitlabDuoSetupMessage": "Níl OAuth GitLab Duo cumraithe. Cláraigh iarratas OAuth ag {applicationsUrl} le URI athghlaoigh {redirectUri} agus scópaí \"{scopes}\", ansin socraigh {clientIdEnv} (agus roghnach {clientSecretEnv}) agus atosaigh.",
     "gitlabDuoSetupDescription": "Tar éis an t-iarratas a chlárú agus na hathróga timpeallachta a shocrú ar an instanc seo de OmniRoute, cliceáil Lean ar aghaidh chun tús a chur le logáil isteach OAuth.",
-    "continue": "Lean ar aghaidh"
+    "continue": "Lean ar aghaidh",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Ceangail Cursor",

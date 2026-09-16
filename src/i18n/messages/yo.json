@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "Ìṣètò OAuth GitLab Duo",
     "gitlabDuoSetupMessage": "A kò tíì ṣètò GitLab Duo OAuth. Forúkọsílẹ̀ ohun èlò OAuth ní {applicationsUrl} pẹ̀lú URI ìpadà {redirectUri} àti àwọn scope \"{scopes}\", lẹ́yìn náà ṣètò {clientIdEnv} (àti {clientSecretEnv} bí o bá fẹ́) kí o sì tún un bẹ̀rẹ̀.",
     "gitlabDuoSetupDescription": "Lẹ́yìn tí a bá ti forúkọsílẹ̀ ohun èlò náà tí a sì ti ṣètò àwọn env vars lórí instance OmniRoute yìí, tẹ Tẹ̀síwájú láti bẹ̀rẹ̀ ìwọlé OAuth.",
-    "continue": "Tẹ̀síwájú"
+    "continue": "Tẹ̀síwájú",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "So Cursor pọ̀",

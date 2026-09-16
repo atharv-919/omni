@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "Pag-setup ng GitLab Duo OAuth",
     "gitlabDuoSetupMessage": "Hindi naka-configure ang GitLab Duo OAuth. Magrehistro ng isang OAuth application sa {applicationsUrl} na may redirect URI na {redirectUri} at mga scope na \"{scopes}\", pagkatapos ay itakda ang {clientIdEnv} (at opsyonal na {clientSecretEnv}) at i-restart.",
     "gitlabDuoSetupDescription": "Matapos mairehistro ang aplikasyon at ma-set ang mga env vars sa instance na ito ng OmniRoute, i-click ang Magpatuloy upang simulan ang OAuth login.",
-    "continue": "Magpatuloy"
+    "continue": "Magpatuloy",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Ikonekta ang Cursor IDE",

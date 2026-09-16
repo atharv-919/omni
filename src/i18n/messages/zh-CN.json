@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "GitLab Duo OAuth 设置",
     "gitlabDuoSetupMessage": "GitLab Duo OAuth 尚未配置。在 {applicationsUrl} 注册一个 OAuth 应用，使用重定向 URI {redirectUri} 和范围 \"{scopes}\"，然后设置 {clientIdEnv}（可选地设置 {clientSecretEnv}）并重启。",
     "gitlabDuoSetupDescription": "在应用程序注册并在此 OmniRoute 实例上设置环境变量后，单击继续以开始 OAuth 登录。",
-    "continue": "继续"
+    "continue": "继续",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "连接 Cursor IDE",

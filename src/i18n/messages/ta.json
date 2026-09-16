@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "GitLab Duo OAuth அமைப்பு",
     "gitlabDuoSetupMessage": "GitLab Duo OAuth அமைக்கப்படவில்லை. {applicationsUrl} இல் ஒரு OAuth பயன்பாட்டை பதிவு செய்யவும், மறுபடியும் URI {redirectUri} மற்றும் அளவைகள் \"{scopes}\" உடன், பின்னர் {clientIdEnv} (மற்றும் விருப்பமாக {clientSecretEnv}) ஐ அமைத்து மீண்டும் தொடங்கவும்.",
     "gitlabDuoSetupDescription": "அப்ப்ளிகேஷன் பதிவு செய்யப்பட்ட பிறகு மற்றும் இந்த OmniRoute instance இல் env vars அமைக்கப்பட்ட பிறகு, OAuth உள்நுழைவுக்கு தொடங்க Continue ஐ கிளிக் செய்யவும்.",
-    "continue": "தொடர்ந்து"
+    "continue": "தொடர்ந்து",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Connect Cursor IDE",

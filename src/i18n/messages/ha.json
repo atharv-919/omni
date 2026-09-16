@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "Saitin GitLab Duo OAuth",
     "gitlabDuoSetupMessage": "Ba a saita GitLab Duo OAuth ba. Yi rajistar manhajar OAuth a {applicationsUrl} tare da URI na turawa {redirectUri} da izini \"{scopes}\", sannan saita {clientIdEnv} (da kuma {clientSecretEnv} idan ana so) kuma sake kunnawa.",
     "gitlabDuoSetupDescription": "Bayan an yi rajistar manhajar kuma an saita masu sauyin yanayi a wannan samfurin OmniRoute, danna Ci gaba don fara shiga ta OAuth.",
-    "continue": "Ci gaba"
+    "continue": "Ci gaba",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Haɗa Cursor",

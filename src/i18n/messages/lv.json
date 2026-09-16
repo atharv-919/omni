@@ -10788,7 +10788,12 @@
     "gitlabDuoSetupTitle": "GitLab Duo OAuth iestatīšana",
     "gitlabDuoSetupMessage": "GitLab Duo OAuth nav konfigurēts. Reģistrējiet OAuth lietotni {applicationsUrl} ar atsaukuma URI {redirectUri} un tvērumiem \"{scopes}\", tad iestatiet {clientIdEnv} (un pēc izvēles {clientSecretEnv}) un pārstartējiet.",
     "gitlabDuoSetupDescription": "Kad lietotne ir reģistrēta un vides mainīgie ir iestatīti šajā OmniRoute instancē, noklikšķiniet Turpināt, lai sāktu OAuth pieteikšanos.",
-    "continue": "Turpināt"
+    "continue": "Turpināt",
+    "copilotPolicyTitle": "Experimental provider — policy status is ambiguous",
+    "copilotPolicyLine1": "OmniRoute connects via api.githubcopilot.com, which GitHub has not published as a general third-party inference API. This integration is experimental and may change without notice.",
+    "copilotPolicyLine2": "Only your own GitHub account may be connected. Never share credentials, pool accounts, or attempt to exceed your plan limits.",
+    "copilotPolicyLine3": "Free and Student plan users receive automatic model selection only. Your Copilot plan terms and any usage limits remain your responsibility.",
+    "copilotPolicyAcknowledge": "I understand — Connect"
   },
   "cursorAuthModal": {
     "title": "Savienot Cursor",

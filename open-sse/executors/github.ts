@@ -14,6 +14,10 @@ import {
 } from "../config/providerHeaderProfiles.ts";
 import { sanitizeResponsesInputItems } from "../services/responsesInputSanitizer.ts";
 import { stripUnsupportedParams } from "../translator/paramSupport.ts";
+import {
+  COPILOT_AUTO_MODEL_ID,
+  COPILOT_AUTO_UPSTREAM_MODEL_ID,
+} from "../services/githubCopilotCapabilities.ts";
 
 /** Correlation-id fallback for runtimes without crypto.randomUUID — still CSPRNG-backed. */
 function randomIdFallback(): string {
@@ -155,6 +159,22 @@ export class GithubExecutor extends BaseExecutor {
 
     const sourceBody = body && typeof body === "object" ? body : {};
     const modifiedBody = { ...sourceBody };
+
+    // Resolve the virtual `copilot-auto` model to a concrete upstream model ID.
+    // For Free / Student accounts, OmniRoute presents only this virtual model so
+    // users cannot inadvertently select a model they are not entitled to use.
+    // GitHub Copilot's chat/completions endpoint requires an explicit `model`
+    // field in the request body; omitting it returns HTTP 400. We send
+    // COPILOT_AUTO_UPSTREAM_MODEL_ID (gpt-4o-2024-11-20), the model GitHub
+    // accepts on Free / Student plans. GitHub may still apply additional routing
+    // logic on its side — do not guarantee a specific response model to the user.
+    //
+    // RISK: if GitHub retires `gpt-4o-2024-11-20` or changes the accepted model
+    // ID for Free plans, this constant must be updated. Monitor GitHub Copilot
+    // API changelogs and the upstream response `model` field for drift.
+    if (model === COPILOT_AUTO_MODEL_ID) {
+      modifiedBody.model = COPILOT_AUTO_UPSTREAM_MODEL_ID;
+    }
 
     // Claude models arrive here already translated to Anthropic-native shape by
     // chatCore.ts (registry targetFormat: "claude" — see registry/github/index.ts)
@@ -335,8 +355,7 @@ export class GithubExecutor extends BaseExecutor {
     const headers: Record<string, string> = {
       ...getGitHubCopilotChatHeaders(stream ? "text/event-stream" : "application/json", initiator),
       Authorization: `Bearer ${token}`,
-      "x-request-id":
-        crypto.randomUUID?.() || randomIdFallback(),
+      "x-request-id": crypto.randomUUID?.() || randomIdFallback(),
     };
 
     // Per-call / per-conversation / per-turn correlation ids the @github/copilot
@@ -344,13 +363,12 @@ export class GithubExecutor extends BaseExecutor {
     // id (getGitHubCopilotMachineId) is stable per-install; these three are
     // fresh uuids. A Copilot-aware client may pin the session/task ids across a
     // conversation via its own headers — honor those when present, else mint.
-    const genId = () =>
-      crypto.randomUUID?.() || randomIdFallback();
-    headers["x-interaction-id"] = this.readClientHeader(clientHeaders, "x-interaction-id") || genId();
+    const genId = () => crypto.randomUUID?.() || randomIdFallback();
+    headers["x-interaction-id"] =
+      this.readClientHeader(clientHeaders, "x-interaction-id") || genId();
     headers["x-client-session-id"] =
       this.readClientHeader(clientHeaders, "x-client-session-id") || genId();
-    headers["x-agent-task-id"] =
-      this.readClientHeader(clientHeaders, "x-agent-task-id") || genId();
+    headers["x-agent-task-id"] = this.readClientHeader(clientHeaders, "x-agent-task-id") || genId();
     // Repository correlation sentinels. The CLI sends the working repo's nwo/host
     // or these literals when there is no repository context. OmniRoute is not
     // repo-scoped, so forward a client-supplied value when present, else sentinel.
@@ -376,7 +394,10 @@ export class GithubExecutor extends BaseExecutor {
     // /v1/messages proxy returns an empty content block for image turns unless
     // copilot-vision-request:true is present; a Copilot-aware harness that sends
     // it should have it honored rather than stripped.
-    if ((this.readClientHeader(clientHeaders, "copilot-vision-request") || "").toLowerCase() === "true") {
+    if (
+      (this.readClientHeader(clientHeaders, "copilot-vision-request") || "").toLowerCase() ===
+      "true"
+    ) {
       headers["copilot-vision-request"] = "true";
     }
 
