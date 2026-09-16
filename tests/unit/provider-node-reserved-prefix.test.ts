@@ -182,7 +182,12 @@ test("shared set size includes live REGISTRY and retired Designer + Felo + Qwen 
   // #11786: SeekAi adds id "seekai" + alias "ska" (406 → 408).
   // #13024 (2b9e7fb3e) GreenPT and #13025 (22473dee5) EURouter each add one REGISTRY member (id ==
   // alias); #13277 (02128f334) registers Arcee AI, adding id "arcee-ai" + alias "arcee" (408 → 412).
-  assert.equal(RESERVED_PREFIX_COUNT, 412);
+  // #12343: BigModel.cn (Zhipu) adds registry id "bigmodel"; its alias is the same string,
+  // so the unique reserved-prefix set grows by 1 (412 → 413).
+  assert.equal(RESERVED_PREFIX_COUNT, 413);
+  assert.equal(isReservedProviderPrefix("bigmodel"), true);
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("seekai"), true);
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("ska"), true);
 });
 
 test("isReservedProviderPrefix rejects non-string input", () => {
