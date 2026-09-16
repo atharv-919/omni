@@ -32,17 +32,18 @@ via API keys), embedded services run on the same machine as OmniRoute and commun
 
 ### Why embedded services?
 
-Five services are embedded:
+Six services are embedded:
 
-| Service         | npm package                        | Default port | Purpose                                                                                                                                                                                |
-| --------------- | ---------------------------------- | :----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **9Router**     | `9router`                          |    20130     | AI router that OmniRoute can use as a sub-provider. Models exposed as `9router/{sub}/{model}`                                                                                          |
-| **CLIProxyAPI** | GitHub release binary (`cliproxy`) |     8317     | Local proxy adapter for Anthropic CLI auth flows. Provides fallback routing when OAuth tokens expire                                                                                   |
-| **Mux**         | `mux` (headless `mux server`)      |     8322     | Local agent-orchestration daemon (coder/mux). Lifecycle-managed only — not a routing target (no LLM proxying).                                                                         |
-| **Bifrost**     | `@maximhq/bifrost`                 |     8080     | Go AI-gateway relay backend. When running, auto-selected by the relay route (`/v1/relay/`)                                                                                             |
-| **Dario**       | `@askalf/dario`                    |     3456     | Claude-subscription proxy — alternative/failover to CLIProxyAPI for Claude-Code-shaped traffic; the injected key becomes `DARIO_ADMIN_TOKEN` gating its `/admin/*` OAuth control plane |
+| Service         | npm package                        | Default port | Purpose                                                                                                                                                                                                                                                                                                                          |
+| --------------- | ---------------------------------- | :----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **9Router**     | `9router`                          |    20130     | AI router that OmniRoute can use as a sub-provider. Models exposed as `9router/{sub}/{model}`                                                                                                                                                                                                                                    |
+| **CLIProxyAPI** | GitHub release binary (`cliproxy`) |     8317     | Local proxy adapter for Anthropic CLI auth flows. Provides fallback routing when OAuth tokens expire                                                                                                                                                                                                                             |
+| **Mux**         | `mux` (headless `mux server`)      |     8322     | Local agent-orchestration daemon (coder/mux). Lifecycle-managed only — not a routing target (no LLM proxying).                                                                                                                                                                                                                   |
+| **Bifrost**     | `@maximhq/bifrost`                 |     8080     | Go AI-gateway relay backend. When running, auto-selected by the relay route (`/v1/relay/`)                                                                                                                                                                                                                                       |
+| **Dario**       | `@askalf/dario`                    |     3456     | Claude-subscription proxy — alternative/failover to CLIProxyAPI for Claude-Code-shaped traffic; the injected key becomes `DARIO_ADMIN_TOKEN` gating its `/admin/*` OAuth control plane                                                                                                                                           |
+| **LLMLingua**   | `@atjsh/llmlingua-2`               |    20135     | Prompt-compression sidecar — real LLMLingua-2 ONNX model (JS/TS port of Microsoft's algorithm). `open-sse/services/compression/engines/llmlingua/index.ts` dispatches `/compress` over HTTP to it, falling back to the in-process worker-thread backend when the sidecar is down. Lifecycle-managed only — not a routing target. |
 
-All five follow the same supervisory model:
+All six follow the same supervisory model:
 
 - OmniRoute installs them under `DATA_DIR/services/{name}/` (isolated from OmniRoute's own `package.json`)
 - OmniRoute spawns and monitors them as child processes
@@ -526,6 +527,38 @@ dedicated port (see `src/lib/services/embedWsProxy.ts`).
 **Security:** The embed proxy routes are classified under `LOCAL_ONLY_API_PREFIXES`
 and can only be reached from loopback. An attacker who obtains a JWT via a
 Cloudflare/Ngrok tunnel cannot proxy into embedded services.
+
+---
+
+### 4.7 LLMLingua endpoints (8 routes)
+
+LLMLingua is a prompt-compression sidecar wrapping `@atjsh/llmlingua-2` (real
+ONNX token-classification model, downloaded from Hugging Face on first
+`/compress` call). It uses the same endpoint shape as Bifrost (no API key —
+`needsApiKey: false`, it never handles credentials).
+
+| Method | Path                                           | Description                                                               |
+| ------ | ---------------------------------------------- | ------------------------------------------------------------------------- |
+| `POST` | `/api/services/llmlingua/install`              | npm-install `@atjsh/llmlingua-2` + peers, write the sidecar server script |
+| `POST` | `/api/services/llmlingua/start`                | Start the sidecar on port 20135 (default)                                 |
+| `POST` | `/api/services/llmlingua/stop`                 | Stop the sidecar                                                          |
+| `POST` | `/api/services/llmlingua/restart`              | Restart the sidecar                                                       |
+| `POST` | `/api/services/llmlingua/update`               | Update to the newer package version                                       |
+| `GET`  | `/api/services/llmlingua/status`               | Live + DB status                                                          |
+| `POST` | `/api/services/llmlingua/auto-start`           | Toggle auto-start                                                         |
+| `POST` | `/api/services/llmlingua/auto-restart-adopted` | Toggle auto-restart of an adopted (pre-existing) instance                 |
+| `GET`  | `/api/services/llmlingua/logs`                 | SSE log tail (via shared `[name]/logs` dynamic route)                     |
+
+**Sidecar contract:** the server script exposes `GET /health` (instant — does
+not wait on the model) and `POST /compress` (`{ text, rate }` →
+`{ text, compressed, ratio }`). The model loads lazily on the first
+`/compress` call.
+
+**Compression wiring:** `open-sse/services/compression/engines/llmlingua/index.ts`'s
+`httpSidecarBackend` calls `LLMLINGUA_BASE_URL` (default
+`http://127.0.0.1:20135`) and only accepts the sidecar's response when it is
+strictly shorter than the input; any failure (not running, timeout, no-op
+response) falls back to the in-process worker-thread backend (`./worker.ts`).
 
 ---
 
