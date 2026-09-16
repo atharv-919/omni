@@ -19,8 +19,6 @@ import { buildPostCallGuardrailContext } from "./chatCore/postCallGuardrailConte
 import { storeSemanticCacheResponse } from "./chatCore/semanticCacheStore.ts";
 import { buildNonStreamingResponseHeaders } from "./chatCore/nonStreamingResponseHeaders.ts";
 import { maybeWrapForcedNonStreamingResponsesJson } from "./chatCore/responsesJsonToSse.ts";
-import { enforceOutputTokenBudget } from "./chatCore/outputTokenBudget.ts";
-import { buildNonStreamingJsonResponse } from "./chatCore/nonStreamingJsonResponse.ts";
 import { maybeConvertJsonBodyToSse } from "./chatCore/jsonBodyToSse.ts";
 import { assembleStreamingResponseHeaders } from "./chatCore/streamingResponseHeaders.ts";
 import { makeOnStreamComplete } from "./chatCore/streamMaterialize.ts";
@@ -28,11 +26,7 @@ import { assembleStreamingPipeline } from "./chatCore/streamingPipeline.ts";
 import { createRoutingEvent, emitRoutingEvent } from "../services/routing/index.ts";
 
 import { routingFinishReason } from "./chatCore/routingFinishReason.ts";
-import {
-  getHeaderValueCaseInsensitive,
-  isNoMemoryRequested,
-  resolveCompressionHeader,
-} from "./chatCore/headers.ts";
+import { getHeaderValueCaseInsensitive } from "./chatCore/headers.ts";
 
 import { getCodexClientSessionId } from "../config/codexIdentity.ts";
 import {
@@ -198,7 +192,7 @@ import type { VideoBridgeLogRedactionEntry } from "@/lib/guardrails/videoBridge"
  * alias is applied via a local cast at each read site instead of widening
  * the whole destructure to a typed object.
  */
-type VideoBridgeLogParam = { observed: boolean; redaction: VideoBridgeLogRedactionEntry[] } | null;
+type _VideoBridgeLogParam = { observed: boolean; redaction: VideoBridgeLogRedactionEntry[] } | null;
 
 /**
  * Core chat handler - shared between SSE and Worker
@@ -1089,7 +1083,6 @@ export async function handleChatCore({
     }
   };
 
-  let pipelineRecovered = false;
   if (stream) {
     try {
       const pipelineOutcome = await runProviderExecutionPipeline({

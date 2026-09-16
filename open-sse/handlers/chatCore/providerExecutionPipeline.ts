@@ -14,7 +14,6 @@ import {
   isModelUnavailableError,
   getNextFamilyFallback as defaultGetNextFamilyFallback,
 } from "../../services/modelFamilyFallback.ts";
-import { COOLDOWN_MS } from "../../config/errorConfig.ts";
 import { normalizeHeaders } from "../../utils/headers.ts";
 import { onFailure } from "./recoveryPolicy.ts";
 
