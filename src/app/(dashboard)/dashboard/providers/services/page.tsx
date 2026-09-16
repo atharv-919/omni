@@ -8,8 +8,9 @@ import { NinerouterServiceTab } from "./tabs/NinerouterServiceTab";
 import { MuxServiceTab } from "./tabs/MuxServiceTab";
 import { BifrostServiceTab } from "./tabs/BifrostServiceTab";
 import { DarioServiceTab } from "./tabs/DarioServiceTab";
+import { SingboxServiceTab } from "./tabs/SingboxServiceTab";
 
-type Tab = "cliproxy" | "9router" | "mux" | "bifrost" | "dario";
+type Tab = "cliproxy" | "9router" | "mux" | "bifrost" | "dario" | "singbox";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "cliproxy", label: "CLIProxyAPI", icon: "swap_horiz" },
@@ -17,6 +18,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "mux", label: "Mux", icon: "hub" },
   { id: "bifrost", label: "Bifrost", icon: "bolt" },
   { id: "dario", label: "Dario", icon: "shield_person" },
+  { id: "singbox", label: "sing-box", icon: "vpn_lock" },
 ];
 
 export default function ServicesPage() {
@@ -64,6 +66,7 @@ export default function ServicesPage() {
         {active === "mux" && <MuxServiceTab />}
         {active === "bifrost" && <BifrostServiceTab />}
         {active === "dario" && <DarioServiceTab />}
+        {active === "singbox" && <SingboxServiceTab />}
       </div>
     </div>
   );
