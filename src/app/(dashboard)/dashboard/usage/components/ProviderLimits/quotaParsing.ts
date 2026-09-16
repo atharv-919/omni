@@ -1,5 +1,4 @@
 import { getModelsByProviderId } from "@omniroute/open-sse/config/providerModels.ts";
-import { getProviderConnectionFamilyIds } from "@/shared/constants/providers";
 import { safePercentage } from "@/shared/utils/formatting";
 
 const GLM_QUOTA_ORDER: Record<string, number> = { session: 0, weekly: 1, mcp_monthly: 2 };
@@ -11,7 +10,7 @@ const CODEX_QUOTA_ORDER: Record<string, number> = {
   banked_reset_credits: 4,
 };
 const GLM_FAMILY_PROVIDERS = ["glm", "glm-cn", "glmt", "opencode-go"];
-const KIMI_CODING_PROVIDERS: readonly string[] = getProviderConnectionFamilyIds("kimi-coding");
+const KIMI_CODING_PROVIDERS = ["kimi-coding", "kimi-coding-apikey"];
 
 /**
  * Providers whose quotas already get a deterministic fixed-window order below
@@ -148,12 +147,7 @@ function normalizeQuotaEntry(name: string, quota: any = {}, extras: any = {}) {
 }
 
 function parseGeneric(data: any) {
-  const quotas = quotaEntries(data).map(([name, quota]) => normalizeQuotaEntry(name, quota));
-  const bankedResetCredits = Number(data?.bankedResetCredits);
-  if (Number.isFinite(bankedResetCredits) && bankedResetCredits >= 0) {
-    quotas.push(buildBankedResetCreditsQuota(bankedResetCredits));
-  }
-  return quotas;
+  return quotaEntries(data).map(([name, quota]) => normalizeQuotaEntry(name, quota));
 }
 
 function parseGithub(data: any) {
@@ -440,32 +434,7 @@ export function isKiloPassDisplayRow(quota: any): boolean {
   return quota?.kiloPass === true || quota?.name === KILO_PASS_DISPLAY_ROW;
 }
 
-function parseMoonshotBalanceQuota(quotaKey: string, quota: any) {
-  if (quotaKey !== "available" && quotaKey !== "voucher" && quotaKey !== "cash") {
-    return normalizeQuotaEntry(quotaKey, quota);
-  }
-  const remaining = Math.max(0, Number(quota?.remaining ?? 0));
-  const currency = quota?.currency || "CNY";
-  const remainingPercentage =
-    safePercentage(quota?.remainingPercentage) ?? (remaining > 0 ? 100 : 0);
-  return buildCreditsQuota(quotaKey, remaining, remainingPercentage, {
-    currency,
-    displayName: quota?.displayName,
-  });
-}
-
-function parseMoonshotBalance(data: any) {
-  return quotaEntries(data).map(([quotaKey, quota]) => parseMoonshotBalanceQuota(quotaKey, quota));
-}
-
-function looksLikeMoonshotBalance(data: any): boolean {
-  const quotas = data?.quotas;
-  if (!quotas || typeof quotas !== "object" || Array.isArray(quotas)) return false;
-  return "available" in quotas && "voucher" in quotas && "cash" in quotas;
-}
-
 function parseProviderQuotas(providerId: string, data: any) {
-  if (looksLikeMoonshotBalance(data)) return parseMoonshotBalance(data);
   if (providerId === "github") return parseGithub(data);
   if (["glm", "glm-cn", "glmt", "opencode-go"].includes(providerId)) return parseGlmFamily(data);
   if (providerId === "antigravity" || providerId === "agy") return parseAntigravity(data);
@@ -479,6 +448,9 @@ function parseProviderQuotas(providerId: string, data: any) {
 }
 
 function sortProviderModelOrder(provider: string, quotas: any[]) {
+  // Antigravity/AGY model IDs are discovered live. Static ordering would rank a model
+  // Google ships tomorrow at 999 and bury it below the collapsed three-row cutoff.
+  if (provider === "antigravity" || provider === "agy") return;
   const modelOrder = getModelsByProviderId(provider);
   if (modelOrder.length === 0) return;
   const orderMap = new Map(modelOrder.map((m, i) => [m.id, i]));
